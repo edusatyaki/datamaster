@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NumPy Masterclass | Interactive Learning</title>
+
+    <!-- External Resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <script>
+        // Prevent Monaco's AMD loader from hijacking Lucide
+        var _tempDefine = window.define;
+        window.define = undefined;
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <script>
+        window.define = _tempDefine;
+    </script>
+
+    <style>
+        :root {
+            --bg-primary: #0f1117;
+            --bg-secondary: #161a23;
+            --bg-tertiary: #1e2532;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2e3748;
+            --sidebar-width: 320px;
+            --header-height: 64px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            height: var(--header-height);
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+            color: var(--accent-blue);
+        }
+
+        .progress-container {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), #60a5fa);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* --- Main Layout --- */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        aside {
+            width: var(--sidebar-width);
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* === Sidebar: Collapsible Accordion === */
+        .category-group {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-header {
+            padding: 12px 16px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--transition-speed);
+            background: var(--bg-secondary);
+        }
+
+        .category-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .category-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-header-left .cat-icon {
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+
+        .category-header-left span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .cat-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed);
+        }
+
+        .cat-badge.has-progress {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .cat-badge.complete {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .chevron {
+            transition: transform 0.25s ease;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .category-group.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .category-group.open .category-header {
+            color: var(--text-primary);
+        }
+
+        .category-group.open .cat-icon {
+            color: var(--accent-blue);
+        }
+
+        .task-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-primary);
+        }
+
+        .category-group.open .task-list {
+            max-height: 600px;
+        }
+
+        /* Cat mini progress strip */
+        .cat-progress-strip {
+            height: 2px;
+            background: var(--bg-tertiary);
+            transition: all 0.4s;
+        }
+
+        .cat-progress-strip-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            transition: width 0.5s ease;
+        }
+
+        .exercise-item {
+            padding: 9px 16px 9px 28px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.875rem;
+            border-left: 3px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .exercise-item:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .exercise-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: var(--accent-blue);
+            color: #7dd3fc;
+        }
+
+        .exercise-item.completed {
+            color: var(--accent-green);
+        }
+
+        .exercise-item.locked {
+            color: var(--text-muted);
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .completed .status-dot {
+            background-color: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        /* Sidebar top summary bar */
+        .sidebar-summary {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .sidebar-summary-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .sidebar-summary-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-primary);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Left Pane: Instructions --- */
+        .instructions-pane {
+            padding: 32px;
+            overflow-y: auto;
+            background-color: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+        }
+
+        h1#task-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .instruction-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+
+        .instruction-text code {
+            background-color: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            color: #ff79c6;
+            font-size: 0.9em;
+        }
+
+        .io-card {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .io-card-header {
+            padding: 12px 16px;
+            background-color: var(--bg-tertiary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .io-card-content {
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: var(--accent-green);
+        }
+
+        /* --- Right Pane: Editor & Terminal --- */
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            height: 48px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        #editor-container {
+            flex: 1;
+        }
+
+        .terminal {
+            height: 250px;
+            background-color: #000;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 8px 16px;
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #terminal-output {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #fff;
+        }
+
+        .text-error {
+            color: var(--accent-red);
+        }
+
+        .text-success {
+            color: var(--accent-green);
+        }
+
+        .text-system {
+            color: var(--accent-blue);
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--accent-green);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Animations --- */
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .loading-pulse {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        /* Mobile Overlay */
+        .mobile-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 1000;
+            padding: 40px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-warning {
+                display: flex;
+            }
+        }
+
+
+        .coin-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-right: 12px;
+        }
+
+        .coin-icon {
+            color: #f59e0b;
+        }
+
+        /* --- Reward Animation --- */
+        .reward-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, 0.9);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .reward-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-blue);
+            padding: 48px;
+            border-radius: 32px;
+            text-align: center;
+            animation: reward-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes reward-pop {
+            0% {
+                transform: scale(0.4) rotate(-5deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .reward-coins {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #f59e0b;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        .coin-float {
+            animation: coin-float 2s infinite ease-in-out;
+        }
+
+        @keyframes coin-float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateY(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotateY(180deg);
+            }
+        }
+
+        /* --- Footer --- */
+        footer {
+            height: 32px;
+            flex-shrink: 0;
+            background-color: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            z-index: 100;
+            letter-spacing: 0.02em;
+            white-space: nowrap;
+        }
+
+        header {
+            flex-shrink: 0;
+            height: auto;
+            flex-direction: column;
+            padding: 0;
+            gap: 0;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 24px;
+            height: 52px;
+            gap: 12px;
+        }
+
+        .header-bottom {
+            width: 100%;
+            padding: 0 24px 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* --- Module Tabs --- */
+        .module-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .module-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 7px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .module-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .module-tab.active {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .module-tab.coming-soon {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .module-tab .tab-badge {
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            color: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="mobile-warning">
+        <i data-lucide="monitor" size="48" style="color: var(--accent-blue); margin-bottom: 24px;"></i>
+        <h2>Desktop Only Experience</h2>
+        <p style="color: var(--text-secondary); margin-top: 12px;">This interactive Python environment requires a
+            desktop-class browser for the best experience.</p>
+    </div>
+
+    <header>
+        <!-- Row 1: Logo | Module Tabs | Controls -->
+        <div class="header-top">
+            <div class="logo">
+                <i data-lucide="layout-grid"></i>
+                NumPyMaster
+            </div>
+
+            <!-- Module Switch Tabs -->
+            <nav class="module-tabs" role="tablist" aria-label="Module navigation">
+                <a href="/" class="module-tab active" id="tab-numpy" role="tab">
+                    <i data-lucide="box" size="13"></i>
+                    1. NumPy
+                </a>
+                <a href="/matplotlib.html" class="module-tab" id="tab-matplotlib" role="tab">
+                    <i data-lucide="line-chart" size="13"></i>
+                    2. Matplotlib
+                </a>
+                <a href="/pandas.html" class="module-tab" id="tab-pandas" role="tab">
+                    <i data-lucide="table-2" size="13"></i>
+                    3. Pandas
+                </a>
+            </nav>
+
+            <!-- Right controls -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div id="coin-display" class="coin-container">
+                    <i data-lucide="coins" class="coin-icon" size="18"></i>
+                    <span id="coin-balance">0</span>
+                </div>
+                <div id="pyodide-status" class="btn btn-primary loading-pulse"
+                    style="background: var(--bg-tertiary); pointer-events: none;">
+                    <i data-lucide="loader-2" class="spin"></i>
+                    Loading Engine...
+                </div>
+            </div>
+        </div>
+
+        <!-- Row 2: Global Progress Bar -->
+        <div class="header-bottom">
+            <span style="font-size:0.7rem; color:var(--text-muted); white-space:nowrap;" id="progress-percent">0%
+                Completed</span>
+            <div class="progress-bar-bg" style="flex:1; max-width:none; margin:0;">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <span style="font-size:0.7rem; color:var(--text-muted); white-space:nowrap;" id="progress-fraction">0/50
+                Exercises</span>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        <aside id="sidebar">
+            <!-- Sidebar content injected by JS -->
+        </aside>
+
+        <main class="content-area">
+            <div class="workspace">
+                <div class="instructions-pane">
+                    <div id="task-category"
+                        style="font-size: 0.8rem; color: var(--accent-blue); font-weight: 600; margin-bottom: 8px; text-transform: uppercase;">
+                        Category Name</div>
+                    <h1 id="task-title">Loading Challenge...</h1>
+                    <div id="task-instructions" class="instruction-text"></div>
+
+                    <div class="io-card">
+                        <div class="io-card-header">Expected Output</div>
+                        <div id="task-output" class="io-card-content"></div>
+                    </div>
+
+                    <div id="success-message"
+                        style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-green); padding: 20px; border-radius: 12px; margin-top: 24px;">
+                        <h3 style="color: var(--accent-green); display: flex; align-items: center; gap: 8px;">
+                            <i data-lucide="check-circle"></i> Excellent!
+                        </h3>
+                        <p style="margin-top: 8px; font-size: 0.9rem; color: var(--text-secondary);">You've mastered
+                            this concept. Ready for the next one?</p>
+                        <button id="next-btn" class="btn btn-success"
+                            style="margin-top: 16px; width: 100%; justify-content: center;">
+                            Next Exercise <i data-lucide="arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="editor-section">
+                    <div class="toolbar">
+                        <div
+                            style="flex: 1; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 0.75rem;">
+                            <i data-lucide="file-code" size="14"></i>
+                            main.py
+                        </div>
+                        <button id="run-btn" class="btn btn-primary" disabled>
+                            <i data-lucide="play" size="16"></i>
+                            Run Code
+                        </button>
+                    </div>
+                    <div id="editor-container"></div>
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <span>TERMINAL</span>
+                            <span id="terminal-status">Ready</span>
+                        </div>
+                        <pre id="terminal-output">Initializing environment...</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="reward-overlay" class="reward-overlay">
+        <div class="reward-card">
+            <h2 style="font-size: 1.8rem; color: var(--accent-blue);">CHALLENGE SOLVED!</h2>
+            <p style="color: var(--text-secondary); margin-top: 12px;">You've earned some coins!</p>
+            <div class="reward-coins">
+                <i data-lucide="coins" class="coin-float" size="48"></i>
+                +5
+            </div>
+            <button class="btn btn-primary" style="width: 100%; height: 50px; justify-content: center; font-size: 1rem;"
+                onclick="document.getElementById('reward-overlay').style.display = 'none';">
+                CONTINUE TO NEXT
+            </button>
+        </div>
+    </div>
+
+    <footer style="gap: 8px;">
+        <i data-lucide="award" size="14" style="color: var(--accent-blue); opacity: 0.8;"></i>
+        Ideation & development Satyaki Das | Innovation in Education v_01.0.0
+    </footer>
+
+    <script>
+        // --- 1. Exercise Data ---
+        const curriculum = [
+            {
+                name: "1. NumPy Fundamentals",
+                tasks: [
+                    {
+                        id: 1,
+                        title: "1. Your First NumPy Array",
+                        instructions: "Import numpy as <code>np</code> and create a 1D array of zeros with a length of 5. Assign it to a variable named <code>arr</code>. Print the array to the console.",
+                        starter: "import numpy as np\n\n# Your code here\n",
+                        expected: "[0. 0. 0. 0. 0.]",
+                        validation: `
+import ast
+
+def check_ast(source_code):
+    try:
+        tree = ast.parse(source_code)
+        used_zeros = False
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call):
+                if isinstance(node.func, ast.Attribute):
+                    if node.func.attr == 'zeros':
+                        used_zeros = True
+        return used_zeros
+    except:
+        return False
+
+try:
+    expected = np.zeros(5)
+    assert 'arr' in locals() or 'arr' in globals(), "TEST_ERROR: You need to assign your array to a variable named 'arr'."
+    assert np.array_equal(arr, expected), "TEST_ERROR: Array does not match the expected output of [0. 0. 0. 0. 0.]."
+    
+    if not check_ast(USER_CODE_STRING):
+        print("TEST_ERROR: You got the right array, but you didn't use np.zeros()! Try again.")
+    else:
+        print("---TEST_PASSED---")
+except AssertionError as e:
+    print(f"{e}")
+except Exception as e:
+    print(f"TEST_ERROR: An unexpected error occurred: {e}")
+`
+                    },
+                    {
+                        id: 2,
+                        title: "Shape (.shape)",
+                        instructions: "Create a 2D array named <code>arr</code> with 3 rows and 4 columns (can be all zeros), and print its <code>.shape</code> attribute.",
+                        starter: "import numpy as np\n\n# Create a 3x4 array named arr\n",
+                        expected: "(3, 4)",
+                        validation: `
+try:
+    assert 'arr' in locals(), "Variable 'arr' not found."
+    assert arr.shape == (3, 4), f"Expected shape (3, 4), got {arr.shape}"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 3,
+                        title: "Total Elements (.size)",
+                        instructions: "Create a 3-dimensional array <code>arr</code> with shape <code>(2, 3, 2)</code> and print its total number of elements using <code>.size</code>.",
+                        starter: "import numpy as np\n\n# Create arr with shape (2,3,2)\n",
+                        expected: "12",
+                        validation: `
+try:
+    assert 'arr' in locals(), "Variable 'arr' not found."
+    assert arr.size == 12, f"Expected 12 elements, got {arr.size}"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 4,
+                        title: "Memory Size (.itemsize)",
+                        instructions: "Create an array <code>arr</code> of integers (e.g., <code>[1, 2, 3]</code>) and print the memory footprint of a single element in bytes using <code>.itemsize</code>.",
+                        starter: "import numpy as np\n\n# Your code here\n",
+                        expected: "8 (or 4 depending on architecture)",
+                        validation: `
+try:
+    assert 'arr' in locals(), "Variable 'arr' not found."
+    assert hasattr(arr, 'itemsize'), "arr should be a numpy array."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 5,
+                        title: "Reshaping (.reshape)",
+                        instructions: "Take a 1D array of numbers from 1 to 12 and reshape it into a 3x4 matrix named <code>arr</code> using <code>.reshape()</code>.",
+                        starter: "import numpy as np\n\n# Create 1-12 array and reshape to 3x4\n",
+                        expected: "[[ 1  2  3  4]\n [ 5  6  7  8]\n [ 9 10 11 12]]",
+                        validation: `
+try:
+    assert 'arr' in locals(), "Variable 'arr' not found."
+    assert arr.shape == (3, 4), f"Shape should be (3, 4), got {arr.shape}"
+    assert np.array_equal(arr.flatten(), np.arange(1, 13)), "Values are incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "2. Array Creation",
+                tasks: [
+                    {
+                        id: 6,
+                        title: "Arange",
+                        instructions: "Use <code>np.arange()</code> to create a 1D array named <code>arr</code> containing all even numbers from 10 to 20 (inclusive).",
+                        starter: "import numpy as np\n\n",
+                        expected: "[10 12 14 16 18 20]",
+                        validation: `
+try:
+    assert np.array_equal(arr, np.arange(10, 21, 2)), "Array content is incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 7,
+                        title: "Linspace",
+                        instructions: "Use <code>np.linspace()</code> to generate an array <code>arr</code> of exactly 5 evenly spaced values between 0 and 1.",
+                        starter: "import numpy as np\n\n",
+                        expected: "[0.   0.25 0.5  0.75 1.  ]",
+                        validation: `
+try:
+    assert len(arr) == 5, "Should have 5 elements."
+    assert np.allclose(arr, np.linspace(0, 1, 5)), "Values are incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 8,
+                        title: "Identity Matrix",
+                        instructions: "Create a 4x4 identity matrix named <code>arr</code> using <code>np.eye()</code>.",
+                        starter: "import numpy as np\n\n",
+                        expected: "[[1. 0. 0. 0.]\n [0. 1. 0. 0.]\n [0. 0. 1. 0.]\n [0. 0. 0. 1.]]",
+                        validation: `
+try:
+    assert np.array_equal(arr, np.eye(4)), "Not an identity matrix."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 9,
+                        title: "Full Arrays",
+                        instructions: "Use <code>np.full()</code> to create a 2x5 array <code>arr</code> filled entirely with the number 7.",
+                        starter: "import numpy as np\n\n",
+                        expected: "[[7 7 7 7 7]\n [7 7 7 7 7]]",
+                        validation: `
+try:
+    assert arr.shape == (2, 5), "Shape should be 2x5"
+    assert np.all(arr == 7), "Should be filled with 7"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 10,
+                        title: "Randomization",
+                        instructions: "Use <code>np.random.randint()</code> to generate a 3x3 matrix <code>arr</code> containing random integers between 1 and 100.",
+                        starter: "import numpy as np\n\n",
+                        expected: "(A 3x3 matrix of random integers)",
+                        validation: `
+try:
+    assert arr.shape == (3, 3), "Shape should be 3x3"
+    assert arr.min() >= 1 and arr.max() <= 100, "Values out of range (1-100)"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "3. Indexing on ndarrays",
+                tasks: [
+                    {
+                        id: 11,
+                        title: "Basic 2D Indexing",
+                        instructions: "Given the matrix <code>mat = np.arange(1, 10).reshape(3,3)</code>, extract the value at second row, third column into variable <code>val</code>.",
+                        starter: "import numpy as np\nmat = np.arange(1, 10).reshape(3,3)\n# mat is:\n# [[1, 2, 3]\n#  [4, 5, 6]\n#  [7, 8, 9]]\n",
+                        expected: "6",
+                        validation: `
+try:
+    assert val == 6, f"Expected 6, got {val}"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 12,
+                        title: "Slicing",
+                        instructions: "Given <code>arr = np.arange(10)</code>, extract elements from index 3 up to (not including) index 7 into <code>sub_arr</code>.",
+                        starter: "import numpy as np\narr = np.arange(10)\n",
+                        expected: "[3 4 5 6]",
+                        validation: `
+try:
+    assert np.array_equal(sub_arr, [3,4,5,6]), "Slice is incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 13,
+                        title: "Boolean Indexing",
+                        instructions: "Given <code>arr = np.array([10, 20, 5, 15, 30])</code>, use a boolean mask to extract only numbers > 15 into <code>result</code>.",
+                        starter: "import numpy as np\narr = np.array([10, 20, 5, 15, 30])\n",
+                        expected: "[20 30]",
+                        validation: `
+try:
+    assert np.array_equal(result, [20, 30]), "Filter is incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 14,
+                        title: "Row/Column Slicing",
+                        instructions: "Given a 4x4 array <code>mat</code>, extract the first column into <code>col1</code> and last column into <code>col4</code>.",
+                        starter: "import numpy as np\nmat = np.arange(16).reshape(4,4)\n",
+                        expected: "col1: [0 4 8 12], col4: [3 7 11 15]",
+                        validation: `
+try:
+    assert np.array_equal(col1, mat[:, 0]), "col1 incorrect"
+    assert np.array_equal(col4, mat[:, 3]), "col4 incorrect"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 15,
+                        title: "Fancy Indexing",
+                        instructions: "Given <code>arr = np.arange(10, 20)</code>, extract the 1st, 4th, and 6th elements using indices <code>[0, 3, 5]</code> into <code>subset</code>.",
+                        starter: "import numpy as np\narr = np.arange(10, 20)\n",
+                        expected: "[10 13 15]",
+                        validation: `
+try:
+    assert np.array_equal(subset, [10, 13, 15]), "Subset is incorrect."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "4. I/O with NumPy",
+                tasks: [
+                    {
+                        id: 16,
+                        title: "Save Binary",
+                        instructions: "Create an array <code>arr = np.array([1, 2, 3])</code> and save it to <code>data.npy</code> using <code>np.save()</code>.",
+                        starter: "import numpy as np\narr = np.array([1, 2, 3])\n",
+                        expected: "File saved",
+                        validation: `
+import os
+try:
+    np.save('data.npy', arr)
+    assert os.path.exists('data.npy'), "File data.npy not found."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 17,
+                        title: "Load Binary",
+                        instructions: "Load the array from <code>data.npy</code> (saved in previous task) into <code>loaded_arr</code> using <code>np.load()</code>.",
+                        starter: "import numpy as np\n# Ensure data.npy exists (we'll pre-create it for the test if needed)\n",
+                        expected: "[1 2 3]",
+                        validation: `
+try:
+    if not os.path.exists('data.npy'): np.save('data.npy', np.array([1,2,3]))
+    loaded_arr = np.load('data.npy')
+    assert np.array_equal(loaded_arr, [1, 2, 3]), "Loaded data differs."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 18,
+                        title: "Save Text",
+                        instructions: "Create a 2D array and save it to <code>matrix.csv</code> with comma delimiter using <code>np.savetxt()</code>.",
+                        starter: "import numpy as np\nmat = np.eye(3)\n",
+                        expected: "File saved",
+                        validation: `
+try:
+    np.savetxt('matrix.csv', mat, delimiter=',')
+    assert os.path.exists('matrix.csv'), "File matrix.csv not found."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 19,
+                        title: "Load Text",
+                        instructions: "Load data from <code>matrix.csv</code> into <code>data</code> using <code>np.loadtxt()</code>.",
+                        starter: "import numpy as np\n",
+                        expected: "[[1. 0. 0.]\n [0. 1. 0.]\n [0. 0. 1.]]",
+                        validation: `
+try:
+    if not os.path.exists('matrix.csv'): np.savetxt('matrix.csv', np.eye(3), delimiter=',')
+    data = np.loadtxt('matrix.csv', delimiter=',')
+    assert np.array_equal(data, np.eye(3)), "Data loaded incorrectly."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 20,
+                        title: "Save Multiple (Zip)",
+                        instructions: "Save <code>arr1 = [1,2]</code> and <code>arr2 = [3,4]</code> into <code>archive.npz</code> using <code>np.savez()</code>.",
+                        starter: "import numpy as np\narr1 = np.array([1, 2])\narr2 = np.array([3, 4])\n",
+                        expected: "Archive saved",
+                        validation: `
+try:
+    np.savez('archive.npz', a=arr1, b=arr2)
+    with np.load('archive.npz') as data:
+        assert 'a' in data and 'b' in data, "Keys missing in archive."
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "5. Data Types",
+                tasks: [
+                    {
+                        id: 21,
+                        title: "Explicit Dtype",
+                        instructions: "Create <code>arr = np.array([1, 2, 3])</code> but set <code>dtype</code> to <code>np.float64</code>.",
+                        starter: "import numpy as np\n",
+                        expected: "[1. 2. 3.] (float64)",
+                        validation: `
+try:
+    assert arr.dtype == np.float64, f"Dtype is {arr.dtype}, expected float64"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 22,
+                        title: "Type Casting",
+                        instructions: "Convert <code>arr = np.array([1.5, 2.7, 3.1])</code> to integers using <code>.astype(int)</code>. Store in <code>int_arr</code>.",
+                        starter: "import numpy as np\narr = np.array([1.5, 2.7, 3.1])\n",
+                        expected: "[1 2 3]",
+                        validation: `
+try:
+    assert int_arr.dtype == int or int_arr.dtype == np.int64 or int_arr.dtype == np.int32, "Not an integer array"
+    assert np.array_equal(int_arr, [1, 2, 3]), "Values incorrect"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 23,
+                        title: "Boolean to Int",
+                        instructions: "Convert <code>bools = np.array([True, False, True])</code> to integers.",
+                        starter: "import numpy as np\nbools = np.array([True, False, True])\n",
+                        expected: "[1 0 1]",
+                        validation: `
+try:
+    result = bools.astype(int)
+    assert np.array_equal(result, [1, 0, 1]), "Casting failed"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 24,
+                        title: "Checking Types",
+                        instructions: "Extract the data type of <code>arr = np.array([1, 2])</code> into <code>dt</code>.",
+                        starter: "import numpy as np\narr = np.array([1, 2])\n",
+                        expected: "int64 (or int32)",
+                        validation: `
+try:
+    assert dt == arr.dtype, "Should be arr.dtype"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 25,
+                        title: "Complex Numbers",
+                        instructions: "Create <code>arr = np.array([1+2j, 3+4j])</code> and extract real parts into <code>reals</code>.",
+                        starter: "import numpy as np\n",
+                        expected: "[1. 3.]",
+                        validation: `
+try:
+    assert np.array_equal(reals, [1, 3]), "Reals extracted incorrectly"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "6. Broadcasting",
+                tasks: [
+                    {
+                        id: 26,
+                        title: "Scalar Broadcasting",
+                        instructions: "Multiply a 3x3 matrix <code>mat</code> (all ones) by 5.",
+                        starter: "import numpy as np\nmat = np.ones((3,3))\n",
+                        expected: "[[5. 5. 5.]\n [5. 5. 5.]\n [5. 5. 5.]]",
+                        validation: `
+try:
+    result = mat * 5
+    assert np.all(result == 5), "Multiplication failed"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 27,
+                        title: "1D to 2D Addition",
+                        instructions: "Add <code>row = [1, 2, 3]</code> to <code>mat = np.zeros((3,3))</code>.",
+                        starter: "import numpy as np\nmat = np.zeros((3,3))\nrow = np.array([1, 2, 3])\n",
+                        expected: "[[1. 2. 3.]\n [1. 2. 3.]\n [1. 2. 3.]]",
+                        validation: `
+try:
+    result = mat + row
+    assert result.shape == (3,3)
+    assert np.all(result[0] == [1,2,3])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 28,
+                        title: "Column + Row",
+                        instructions: "Add a column vector <code>col = np.arange(4).reshape(4,1)</code> to <code>row = np.arange(4)</code>.",
+                        starter: "import numpy as np\ncol = np.arange(4).reshape(4,1)\nrow = np.arange(4)\n",
+                        expected: "4x4 addition grid",
+                        validation: `
+try:
+    result = col + row
+    assert result.shape == (4, 4)
+    assert result[1,1] == 2
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 29,
+                        title: "Element-wise Squaring",
+                        instructions: "Square every element in <code>mat = np.array([[1,2], [3,4]])</code>.",
+                        starter: "import numpy as np\nmat = np.array([[1,2],[3,4]])\n",
+                        expected: "[[1 4]\n [9 16]]",
+                        validation: `
+try:
+    result = mat**2
+    assert np.array_equal(result, [[1,4],[9,16]])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 30,
+                        title: "Mean Centering",
+                        instructions: "Subtract the mean of each column from <code>mat = np.array([[1, 2], [3, 4]])</code>.",
+                        starter: "import numpy as np\nmat = np.array([[1, 2], [3, 4]])\n",
+                        expected: "[[-1. -1.]\n [ 1.  1.]]",
+                        validation: `
+try:
+    centered = mat - mat.mean(axis=0)
+    assert np.allclose(centered, [[-1,-1],[1,1]])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "7. Copies and Views",
+                tasks: [
+                    {
+                        id: 31,
+                        title: "Modifying a View",
+                        instructions: "Create a slice <code>v</code> of <code>a = np.array([1, 2, 3])</code>, change <code>v[0]</code>, and see <code>a</code> change.",
+                        starter: "import numpy as np\na = np.array([1, 2, 3])\n",
+                        expected: "a[0] will be updated",
+                        validation: `
+try:
+    v = a[0:2]
+    v[0] = 99
+    assert a[0] == 99, "Original array not modified"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 32,
+                        title: "Creating a Deep Copy",
+                        instructions: "Use <code>.copy()</code> to copy <code>a = np.array([1, 2, 3])</code> into <code>b</code>, modify <code>b</code>, and ensure <code>a</code> is same.",
+                        starter: "import numpy as np\na = np.array([1, 2, 3])\n",
+                        expected: "a remains [1, 2, 3]",
+                        validation: `
+try:
+    b = a.copy()
+    b[0] = 99
+    assert a[0] == 1, "Original array was modified!"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 33,
+                        title: "Checking Shared Memory",
+                        instructions: "Use <code>np.shares_memory()</code> to check if <code>a</code> and its slice shared memory.",
+                        starter: "import numpy as np\na = np.arange(10)\ns = a[2:5]\n",
+                        expected: "True",
+                        validation: `
+try:
+    res = np.shares_memory(a, s)
+    assert res == True
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 34,
+                        title: "Ravel (View)",
+                        instructions: "Flatten <code>mat = np.eye(2)</code> using <code>.ravel()</code> into <code>r</code>, modify <code>r[0]</code>.",
+                        starter: "import numpy as np\nmat = np.eye(2)\n",
+                        expected: "mat[0,0] changes",
+                        validation: `
+try:
+    r = mat.ravel()
+    r[0] = 5
+    assert mat[0,0] == 5, "Ravel should be a view"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 35,
+                        title: "Flatten (Copy)",
+                        instructions: "Flatten <code>mat = np.eye(2)</code> using <code>.flatten()</code> into <code>f</code>, modify <code>f[0]</code>.",
+                        starter: "import numpy as np\nmat = np.eye(2)\n",
+                        expected: "mat[0,0] remains 1",
+                        validation: `
+try:
+    f = mat.flatten()
+    f[0] = 5
+    assert mat[0,0] == 1, "Flatten should be a copy"
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "8. String Operations",
+                tasks: [
+                    {
+                        id: 36,
+                        title: "String Concatenation",
+                        instructions: "Use <code>np.char.add()</code> to combine <code>['Alice', 'Bob']</code> and <code>[' Smith', ' Jones']</code>.",
+                        starter: "import numpy as np\nfirst = np.array(['Alice', 'Bob'])\nlast = np.array([' Smith', ' Jones'])\n",
+                        expected: "['Alice Smith' 'Bob Jones']",
+                        validation: `
+try:
+    res = np.char.add(first, last)
+    assert np.array_equal(res, ['Alice Smith', 'Bob Jones'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 37,
+                        title: "Uppercase Conversion",
+                        instructions: "Convert <code>arr = np.array(['apple', 'banana'])</code> to uppercase.",
+                        starter: "import numpy as np\narr = np.array(['apple', 'banana'])\n",
+                        expected: "['APPLE' 'BANANA']",
+                        validation: `
+try:
+    res = np.char.upper(arr)
+    assert np.array_equal(res, ['APPLE', 'BANANA'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 38,
+                        title: "Replacing Substrings",
+                        instructions: "Replace 'cat' with 'dog' in <code>['cat box', 'my cat']</code> using <code>np.char.replace()</code>.",
+                        starter: "import numpy as np\narr = np.array(['cat box', 'my cat'])\n",
+                        expected: "['dog box' 'my dog']",
+                        validation: `
+try:
+    res = np.char.replace(arr, 'cat', 'dog')
+    assert np.array_equal(res, ['dog box', 'my dog'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 39,
+                        title: "Counting Characters",
+                        instructions: "Count occurrences of 'a' in <code>['banana', 'apple']</code>.",
+                        starter: "import numpy as np\narr = np.array(['banana', 'apple'])\n",
+                        expected: "[3 1]",
+                        validation: `
+try:
+    res = np.char.count(arr, 'a')
+    assert np.array_equal(res, [3, 1])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 40,
+                        title: "Stripping Whitespace",
+                        instructions: "Strip whitespace from <code>[' apple ', ' banana ']</code>.",
+                        starter: "import numpy as np\narr = np.array([' apple ', ' banana '])\n",
+                        expected: "['apple' 'banana']",
+                        validation: `
+try:
+    res = np.char.strip(arr)
+    assert np.array_equal(res, ['apple', 'banana'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "9. Structured Arrays",
+                tasks: [
+                    {
+                        id: 41,
+                        title: "Creating Structured Dtypes",
+                        instructions: "Create an array <code>arr</code> with dtype <code>[('name', 'U10'), ('age', 'i4')]</code> featuring two people.",
+                        starter: "import numpy as np\n",
+                        expected: "Structured array",
+                        validation: `
+try:
+    assert arr.dtype.names == ('name', 'age')
+    assert len(arr) >= 1
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 42,
+                        title: "Accessing Fields",
+                        instructions: "Given <code>arr</code> from previous, extract only the 'name' field.",
+                        starter: "import numpy as np\narr = np.array([('Alice', 25), ('Bob', 30)], dtype=[('name', 'U10'), ('age', 'i4')])\n",
+                        expected: "['Alice' 'Bob']",
+                        validation: `
+try:
+    names = arr['name']
+    assert np.array_equal(names, ['Alice', 'Bob'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 43,
+                        title: "Sorting by Field",
+                        instructions: "Sort <code>arr</code> by the 'age' field using <code>np.sort()</code>.",
+                        starter: "import numpy as np\narr = np.array([('Bob', 30), ('Alice', 25)], dtype=[('name', 'U10'), ('age', 'i4')])\n",
+                        expected: "Sorted array",
+                        validation: `
+try:
+    res = np.sort(arr, order='age')
+    assert res[0]['name'] == 'Alice'
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 44,
+                        title: "Filtering Records",
+                        instructions: "Filter records where <code>age > 28</code>.",
+                        starter: "import numpy as np\narr = np.array([('Bob', 30), ('Alice', 25)], dtype=[('name', 'U10'), ('age', 'i4')])\n",
+                        expected: "[('Bob', 30)]",
+                        validation: `
+try:
+    res = arr[arr['age'] > 28]
+    assert len(res) == 1 and res[0]['name'] == 'Bob'
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 45,
+                        title: "Record Arrays",
+                        instructions: "Convert to record array using <code>np.rec.array()</code> and access <code>.name</code>.",
+                        starter: "import numpy as np\narr = np.array([('Alice', 25)], dtype=[('name', 'U10'), ('age', 'i4')])\n",
+                        expected: "['Alice']",
+                        validation: `
+try:
+    rec = np.rec.array(arr)
+    assert np.array_equal(rec.name, ['Alice'])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            },
+            {
+                name: "10. Universal Functions (ufunc)",
+                tasks: [
+                    {
+                        id: 46,
+                        title: "Square Roots",
+                        instructions: "Apply <code>np.sqrt()</code> to <code>[4, 9, 16, 25]</code>.",
+                        starter: "import numpy as np\narr = np.array([4, 9, 16, 25])\n",
+                        expected: "[2. 3. 4. 5.]",
+                        validation: `
+try:
+    res = np.sqrt(arr)
+    assert np.array_equal(res, [2,3,4,5])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 47,
+                        title: "Element-wise Addition",
+                        instructions: "Use <code>np.add(a, b)</code> to add <code>[1,2]</code> and <code>[3,4]</code>.",
+                        starter: "import numpy as np\na = [1, 2]\nb = [3, 4]\n",
+                        expected: "[4 6]",
+                        validation: `
+try:
+    res = np.add(a, b)
+    assert np.array_equal(res, [4, 6])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 48,
+                        title: "Trigonometry",
+                        instructions: "Calculate sines of <code>[0, np.pi/2, np.pi]</code> using <code>np.sin()</code>.",
+                        starter: "import numpy as np\nangles = np.array([0, np.pi/2, np.pi])\n",
+                        expected: "[0. 1. 0.]",
+                        validation: `
+try:
+    res = np.sin(angles)
+    assert np.allclose(res, [0, 1, 0])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 49,
+                        title: "Finding Maximums",
+                        instructions: "Use <code>np.maximum(a, b)</code> on <code>[1, 5]</code> and <code>[2, 3]</code>.",
+                        starter: "import numpy as np\na = [1, 5]\nb = [2, 3]\n",
+                        expected: "[2 5]",
+                        validation: `
+try:
+    res = np.maximum(a, b)
+    assert np.array_equal(res, [2, 5])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    },
+                    {
+                        id: 50,
+                        title: "Cumulative Sum",
+                        instructions: "Calculate <code>np.cumsum()</code> of <code>[1, 2, 3, 4]</code>.",
+                        starter: "import numpy as np\narr = np.array([1, 2, 3, 4])\n",
+                        expected: "[ 1  3  6 10]",
+                        validation: `
+try:
+    res = np.cumsum(arr)
+    assert np.array_equal(res, [1, 3, 6, 10])
+    print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")
+`
+                    }
+                ]
+            }
+        ];
+
+        // --- 2. GUI State ---
+        // --- 2. GUI State ---
+        let currentExerciseIndex = 0;
+        const allTasks = curriculum.flatMap(c => c.tasks.map(t => ({ ...t, category: c.name })));
+        let completedSet = new Set();
+        let totalCoins = 0;
+        let editor;
+        let isEngineReady = false;
+
+        // --- 3. IndexedDB Progress Management ---
+        const DB_NAME = "Application";
+        const STORE_NAME = "numpy_mastery";
+
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = (e) => resolve(e.target.result);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        async function loadProgress() {
+            try {
+                const db = await initDB();
+                return new Promise((resolve) => {
+                    const tx = db.transaction(STORE_NAME, "readonly");
+                    const store = tx.objectStore(STORE_NAME);
+                    const request = store.get("progress_data");
+                    request.onsuccess = () => {
+                        const data = request.result || { completed: [], coins: 0 };
+                        completedSet = new Set(data.completed);
+                        totalCoins = data.coins;
+                        resolve();
+                    };
+                });
+            } catch (e) {
+                console.error("DB Load Error", e);
+            }
+        }
+
+        async function saveProgress() {
+            try {
+                const db = await initDB();
+                const tx = db.transaction(STORE_NAME, "readwrite");
+                const store = tx.objectStore(STORE_NAME);
+                store.put({ completed: Array.from(completedSet), coins: totalCoins }, "progress_data");
+            } catch (e) {
+                console.error("DB Save Error", e);
+            }
+        }
+
+        // --- 4. DOM Elements ---
+        const sidebar = document.getElementById('sidebar');
+        const runBtn = document.getElementById('run-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const terminalOutput = document.getElementById('terminal-output');
+        const pyodideStatus = document.getElementById('pyodide-status');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressFraction = document.getElementById('progress-fraction');
+        const taskTitle = document.getElementById('task-title');
+        const taskCategory = document.getElementById('task-category');
+        const taskInstructions = document.getElementById('task-instructions');
+        const taskOutput = document.getElementById('task-output');
+        const successMessage = document.getElementById('success-message');
+
+        // --- 5. Initialize Lucide Icons ---
+        function safeCreateIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+
+        // --- 6. Pyodide Setup ---
+        const workerCode = `
+            importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js");
+            
+            async function init() {
+                try {
+                    self.postMessage({ type: 'status', message: 'Engine: Downloading Core...' });
+                    const pyodide = await loadPyodide({ 
+                        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/" 
+                    });
+                    self.postMessage({ type: 'status', message: 'Engine: Loading NumPy...' });
+                    await pyodide.loadPackage(["numpy"]);
+                    self.postMessage({ type: 'ready' });
+                    return pyodide;
+                } catch (e) {
+                    self.postMessage({ type: 'error', message: e.message });
+                }
+            }
+
+            let pyodideReadyPromise = init();
+
+            self.onmessage = async (event) => {
+                const { code } = event.data;
+                const pyodide = await pyodideReadyPromise;
+                if (!pyodide) return;
+                
+                try {
+                    let output = "";
+                    pyodide.setStdout({ batched: (str) => { output += str + "\\n"; } });
+                    pyodide.setStderr({ batched: (str) => { output += str + "\\n"; } });
+
+                    await pyodide.runPythonAsync(code);
+                    self.postMessage({ type: 'result', output, success: true });
+                } catch (error) {
+                    self.postMessage({ type: 'result', error: error.message, success: false });
+                }
+            };
+        `;
+        const blob = new Blob([workerCode], { type: "application/javascript" });
+        const worker = new Worker(URL.createObjectURL(blob));
+
+        worker.onmessage = (e) => {
+            const data = e.data;
+
+            if (data.type === 'status') {
+                pyodideStatus.innerHTML = `<i data-lucide="loader-2" class="spin" size="14"></i> ${data.message}`;
+                terminalOutput.innerText = data.message;
+                safeCreateIcons();
+                return;
+            }
+
+            if (data.type === 'ready') {
+                isEngineReady = true;
+                pyodideStatus.innerHTML = '<i data-lucide="zap" size="16"></i> Engine Ready';
+                pyodideStatus.style.background = 'var(--accent-green)';
+                pyodideStatus.classList.remove('loading-pulse');
+                runBtn.disabled = false;
+                terminalOutput.innerText = "Python 3.11 with NumPy initialized.\nSelect a task and start coding.";
+                safeCreateIcons();
+                return;
+            }
+
+            if (data.type === 'result') {
+                const { output, error, success } = data;
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<i data-lucide="play" size="16"></i> Run Code';
+                safeCreateIcons();
+
+                if (success) {
+                    const cleanOutput = (output || "").replace("---TEST_PASSED---\n", "").trim();
+                    terminalOutput.innerHTML = cleanOutput ? cleanOutput : '<span class="text-system">Code executed silently.</span>';
+
+                    if (output && output.includes("---TEST_PASSED---")) {
+                        markComplete(currentExerciseIndex);
+                        successMessage.style.display = 'block';
+                        terminalOutput.innerHTML += '<br><br><span class="text-success">Test Passed! Excellent Work.</span>';
+                    }
+                } else {
+                    terminalOutput.innerHTML = `<span class="text-error">ERROR:\n${error}</span>`;
+                }
+            }
+        };
+
+        // --- 7. Core Logic ---
+        function renderSidebar() {
+            sidebar.innerHTML = '';
+
+            // --- Top summary bar ---
+            const totalCompleted = completedSet.size;
+            const totalTasks = allTasks.length;
+            const summaryPct = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'sidebar-summary';
+            summaryDiv.innerHTML = `
+                <span>${totalCompleted}/${totalTasks} done</span>
+                <div class="sidebar-summary-bar">
+                    <div class="sidebar-summary-bar-fill" style="width:${summaryPct}%"></div>
+                </div>
+                <span>${summaryPct}%</span>`;
+            sidebar.appendChild(summaryDiv);
+
+            curriculum.forEach((cat, catIdx) => {
+                const catTasks = cat.tasks;
+                const catCompletedCount = catTasks.filter(t => completedSet.has(t.id)).length;
+                const catPct = catTasks.length > 0 ? Math.round((catCompletedCount / catTasks.length) * 100) : 0;
+                const catAllDone = catCompletedCount === catTasks.length;
+
+                // Does this category contain the active exercise?
+                const containsActive = catTasks.some(t => allTasks.findIndex(a => a.id === t.id) === currentExerciseIndex);
+
+                const group = document.createElement('div');
+                group.className = 'category-group' + (containsActive ? ' open' : '');
+
+                // Badge text
+                const badgeClass = catAllDone ? 'cat-badge complete' : catCompletedCount > 0 ? 'cat-badge has-progress' : 'cat-badge';
+                const badgeText = catAllDone ? '✓ Done' : `${catCompletedCount}/${catTasks.length}`;
+
+                // Category header
+                const header = document.createElement('div');
+                header.className = 'category-header';
+                header.innerHTML = `
+                    <div class="category-header-left">
+                        <i data-lucide="folder" size="13" class="cat-icon"></i>
+                        <span>${cat.name}</span>
+                    </div>
+                    <div class="cat-meta">
+                        <span class="${badgeClass}">${badgeText}</span>
+                        <i data-lucide="chevron-down" size="14" class="chevron"></i>
+                    </div>`;
+
+                // Mini progress strip below header
+                const strip = document.createElement('div');
+                strip.className = 'cat-progress-strip';
+                strip.innerHTML = `<div class="cat-progress-strip-fill" style="width:${catPct}%"></div>`;
+
+                // Task list container
+                const taskList = document.createElement('div');
+                taskList.className = 'task-list';
+
+                catTasks.forEach(task => {
+                    const idx = allTasks.findIndex(t => t.id === task.id);
+                    const isCompleted = completedSet.has(task.id);
+                    const isLocked = idx > 0 && !completedSet.has(allTasks[idx - 1].id);
+
+                    const item = document.createElement('div');
+                    item.className = `exercise-item ${idx === currentExerciseIndex ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
+
+                    let statusIcon = isLocked
+                        ? '<i data-lucide="lock" size="12"></i>'
+                        : '<div class="status-dot"></div>';
+                    if (isCompleted) statusIcon = '<i data-lucide="check-circle" size="12"></i>';
+
+                    // Short title (strip leading number if present)
+                    const shortTitle = task.title.replace(/^\d+\.\s*/, '');
+                    item.innerHTML = `${statusIcon} <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${shortTitle}</span>`;
+
+                    if (!isLocked) item.onclick = () => loadExercise(idx);
+                    taskList.appendChild(item);
+                });
+
+                // Toggle open/close on header click
+                header.addEventListener('click', () => {
+                    group.classList.toggle('open');
+                });
+
+                group.appendChild(header);
+                group.appendChild(strip);
+                group.appendChild(taskList);
+                sidebar.appendChild(group);
+            });
+
+            updateProgress();
+            safeCreateIcons();
+        }
+
+        function loadExercise(index) {
+            currentExerciseIndex = index;
+            const task = allTasks[index];
+
+            taskTitle.innerText = task.title;
+            taskCategory.innerText = task.category;
+            taskInstructions.innerHTML = task.instructions;
+            taskOutput.innerText = task.expected;
+            successMessage.style.display = 'none';
+
+            if (isEngineReady) {
+                terminalOutput.innerText = "Terminal ready...";
+            }
+
+            if (editor) {
+                editor.setValue(task.starter);
+            }
+
+            // Update active state in sidebar
+            document.querySelectorAll('.exercise-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        function markComplete(index) {
+            const task = allTasks[index];
+            if (!completedSet.has(task.id)) {
+                completedSet.add(task.id);
+                totalCoins += 5;
+                saveProgress();
+                showReward();
+            }
+            renderSidebar();
+        }
+
+        function showReward() {
+            document.getElementById('reward-overlay').style.display = 'flex';
+            safeCreateIcons();
+        }
+
+        function updateProgress() {
+            const total = allTasks.length;
+            const completed = completedSet.size;
+            const percent = Math.round((completed / total) * 100);
+
+            progressBar.style.width = `${percent}%`;
+            progressPercent.innerText = `${percent}% Completed`;
+            progressFraction.innerText = `${completed}/${total} Exercises`;
+            document.getElementById('coin-balance').innerText = totalCoins;
+        }
+
+        // --- 8. Monaco Editor Setup ---
+        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: allTasks[0].starter,
+                language: 'python',
+                theme: 'vs-dark',
+                automaticLayout: true,
+                minimap: { enabled: false },
+                fontSize: 14,
+                fontFamily: "'Fira Code', monospace",
+                padding: { top: 20 },
+                lineNumbersMinChars: 3,
+                scrollBeyondLastLine: false,
+                roundedSelection: true,
+                cursorSmoothCaretAnimation: "on"
+            });
+            startApp();
+        });
+
+        // --- 9. Event Handlers ---
+        runBtn.addEventListener('click', () => {
+            const userCode = editor.getValue();
+            const validation = allTasks[currentExerciseIndex].validation;
+            terminalOutput.innerHTML = '<span class="text-system">Executing...</span>';
+            runBtn.disabled = true;
+            runBtn.innerText = "⚙️ Working...";
+            successMessage.style.display = 'none';
+
+            const escapedUserCode = userCode.replace(/\\/g, '\\\\').replace(/'''/g, "\\'\\'\\'");
+
+            const fullCode = `
+${userCode}
+
+USER_CODE_STRING = '''
+${escapedUserCode}
+'''
+
+${validation}
+`;
+            worker.postMessage({ code: fullCode });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            document.getElementById('reward-overlay').style.display = 'none';
+            if (currentExerciseIndex < allTasks.length - 1) {
+                loadExercise(currentExerciseIndex + 1);
+            } else {
+                alert("🎉 Congratulations! You've completed the entire NumPy course!");
+            }
+        });
+
+        async function startApp() {
+            await loadProgress();
+            renderSidebar();
+            loadExercise(0);
+            safeCreateIcons();
+        }
+
+    </script>
+</body>
+
+</html>
