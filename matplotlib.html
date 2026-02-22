@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlotNinja | Matplotlib Masterclass</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    <script>var _tempDefine = window.define; window.define = undefined;</script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <script>window.define = _tempDefine;</script>
+    <style>
+        :root {
+            --bg-primary: #0f1117;
+            --bg-secondary: #161a23;
+            --bg-tertiary: #1e2532;
+            --accent-blue: #8b5cf6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: #2e3748;
+            --sidebar-width: 320px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 24px;
+            height: 52px;
+            gap: 12px;
+        }
+
+        .header-bottom {
+            width: 100%;
+            padding: 0 24px 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.025em;
+            color: var(--accent-blue);
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), #d946ef);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Module Tabs */
+        .module-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--bg-tertiary);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .module-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 7px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .module-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .module-tab.active {
+            background: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+
+        .coin-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(245, 158, 11, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Layout */
+        .main-wrapper {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        aside {
+            width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Sidebar Accordion */
+        .sidebar-summary {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-summary-bar {
+            flex: 1;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .sidebar-summary-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 2px;
+            transition: width 0.5s;
+        }
+
+        .category-group {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-header {
+            padding: 12px 16px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: background var(--transition-speed);
+            background: var(--bg-secondary);
+        }
+
+        .category-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .category-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-header-left span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cat-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .cat-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed);
+        }
+
+        .cat-badge.has-progress {
+            background: rgba(16, 185, 129, 0.12);
+            color: var(--accent-green);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .cat-badge.complete {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .chevron {
+            transition: transform 0.25s;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .category-group.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        .category-group.open .category-header {
+            color: var(--text-primary);
+        }
+
+        .task-list {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-primary);
+        }
+
+        .category-group.open .task-list {
+            max-height: 600px;
+        }
+
+        .cat-progress-strip {
+            height: 2px;
+            background: var(--bg-tertiary);
+        }
+
+        .cat-progress-strip-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            transition: width 0.5s;
+        }
+
+        .exercise-item {
+            padding: 9px 16px 9px 28px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.875rem;
+            border-left: 3px solid transparent;
+            color: var(--text-secondary);
+        }
+
+        .exercise-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .exercise-item.active {
+            background: rgba(139, 92, 246, 0.1);
+            border-left-color: var(--accent-blue);
+            color: #c4b5fd;
+        }
+
+        .exercise-item.completed {
+            color: var(--accent-green);
+        }
+
+        .exercise-item.locked {
+            color: var(--text-muted);
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .completed .status-dot {
+            background: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        /* Content */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-primary);
+        }
+
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .instructions-pane {
+            padding: 32px;
+            overflow-y: auto;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+        }
+
+        h1#task-title {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .instruction-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+
+        .instruction-text code {
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            color: #ff79c6;
+            font-size: 0.9em;
+        }
+
+        .io-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .io-card-header {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .io-card-content {
+            padding: 16px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            color: var(--accent-green);
+        }
+
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            height: 48px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 16px;
+            gap: 12px;
+        }
+
+        #editor-container {
+            flex: 1;
+        }
+
+        .terminal {
+            height: 350px;
+            background: #000;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #terminal-output {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .rendered-plot {
+            max-width: 100%;
+            max-height: 260px;
+            object-fit: contain;
+            background: white;
+            border-radius: 4px;
+            padding: 8px;
+            align-self: flex-start;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .text-error {
+            color: var(--accent-red);
+        }
+
+        .text-success {
+            color: var(--accent-green);
+        }
+
+        .text-system {
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #7c3aed;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .loading-pulse {
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .reward-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 17, 23, 0.9);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .reward-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-blue);
+            padding: 48px;
+            border-radius: 32px;
+            text-align: center;
+            animation: reward-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes reward-pop {
+            0% {
+                transform: scale(0.4) rotate(-5deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .reward-coins {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #f59e0b;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+
+        @keyframes coin-float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotateY(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotateY(180deg);
+            }
+        }
+
+        .coin-float {
+            animation: coin-float 2s infinite ease-in-out;
+        }
+
+        .mobile-warning {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            z-index: 1000;
+            padding: 40px;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        @media(max-width:1024px) {
+            .mobile-warning {
+                display: flex;
+            }
+        }
+
+        footer {
+            height: 32px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            z-index: 100;
+            flex-shrink: 0;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mobile-warning">
+        <i data-lucide="monitor" size="48" style="color:var(--accent-blue);margin-bottom:24px;"></i>
+        <h2>Desktop Only Experience</h2>
+        <p style="color:var(--text-secondary);margin-top:12px;">This environment requires a desktop browser.</p>
+    </div>
+
+    <header>
+        <div class="header-top">
+            <div class="logo"><i data-lucide="line-chart"></i> PlotNinja</div>
+            <nav class="module-tabs" role="tablist">
+                <a href="/" class="module-tab" id="tab-numpy"><i data-lucide="box" size="13"></i> 1. NumPy</a>
+                <a href="/matplotlib.html" class="module-tab active" id="tab-matplotlib"><i data-lucide="line-chart"
+                        size="13"></i> 2. Matplotlib</a>
+                <a href="/pandas.html" class="module-tab" id="tab-pandas"><i data-lucide="table-2" size="13"></i> 3.
+                    Pandas</a>
+            </nav>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div id="coin-display" class="coin-container"><i data-lucide="coins" size="18"></i><span
+                        id="coin-balance">0</span></div>
+                <div id="pyodide-status" class="btn btn-primary loading-pulse"
+                    style="background:var(--bg-tertiary);pointer-events:none;">
+                    <i data-lucide="loader-2" class="spin"></i> Loading Matplotlib...
+                </div>
+            </div>
+        </div>
+        <div class="header-bottom">
+            <span style="font-size:0.7rem;color:var(--text-muted);white-space:nowrap;" id="progress-percent">0%
+                Completed</span>
+            <div class="progress-bar-bg" style="flex:1;max-width:none;margin:0;">
+                <div id="progress-bar" class="progress-bar-fill"></div>
+            </div>
+            <span style="font-size:0.7rem;color:var(--text-muted);white-space:nowrap;" id="progress-fraction">0/30
+                Exercises</span>
+        </div>
+    </header>
+
+    <div class="main-wrapper">
+        <aside id="sidebar"></aside>
+        <main class="content-area">
+            <div class="workspace">
+                <div class="instructions-pane">
+                    <div id="task-category"
+                        style="font-size:0.8rem;color:var(--accent-blue);font-weight:600;margin-bottom:8px;text-transform:uppercase;">
+                        Category</div>
+                    <h1 id="task-title">Loading Challenge...</h1>
+                    <div id="task-instructions" class="instruction-text"></div>
+                    <div class="io-card">
+                        <div class="io-card-header">Expected Chart Output</div>
+                        <div id="task-output" class="io-card-content"></div>
+                    </div>
+                    <div id="success-message"
+                        style="display:none;background:rgba(16,185,129,0.1);border:1px solid var(--accent-green);padding:20px;border-radius:12px;margin-top:24px;">
+                        <h3 style="color:var(--accent-green);display:flex;align-items:center;gap:8px;"><i
+                                data-lucide="check-circle"></i> Excellent!</h3>
+                        <p style="margin-top:8px;font-size:0.9rem;color:var(--text-secondary);">You've mastered this
+                            concept.</p>
+                        <button id="next-btn" class="btn btn-success"
+                            style="margin-top:16px;width:100%;justify-content:center;">Next Exercise <i
+                                data-lucide="arrow-right"></i></button>
+                    </div>
+                </div>
+                <div class="editor-section">
+                    <div class="toolbar">
+                        <div
+                            style="flex:1;display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:0.75rem;">
+                            <i data-lucide="file-code" size="14"></i> main.py</div>
+                        <button id="run-btn" class="btn btn-primary" disabled><i data-lucide="play" size="16"></i> Run
+                            &amp; Plot</button>
+                    </div>
+                    <div id="editor-container"></div>
+                    <div class="terminal">
+                        <div class="terminal-header"><span>OUTPUT CONSOLE</span><span id="terminal-status">Ready</span>
+                        </div>
+                        <div id="terminal-output"><span style="color:#fff">Downloading Pyodide and Matplotlib (this
+                                takes a moment)...</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="reward-overlay" class="reward-overlay">
+        <div class="reward-card">
+            <h2 style="font-size:1.8rem;color:var(--accent-blue);">CHALLENGE SOLVED!</h2>
+            <p style="color:var(--text-secondary);margin-top:12px;">You've earned Ninja coins!</p>
+            <div class="reward-coins"><i data-lucide="coins" class="coin-float" size="48"></i> +5</div>
+            <button class="btn btn-primary" style="width:100%;height:50px;justify-content:center;font-size:1rem;"
+                onclick="document.getElementById('reward-overlay').style.display='none';">CONTINUE</button>
+        </div>
+    </div>
+    <footer><i data-lucide="award" size="14" style="color:var(--accent-blue);opacity:0.8;"></i> Ideation &amp;
+        development Satyaki Das | Innovation in Education v_01.0.0</footer>
+
+    <script>
+        // ============================================================
+        // 1. CURRICULUM
+        // ============================================================
+        const curriculum = [
+            {
+                name: "1. Basics & Line Plots", tasks: [
+                    {
+                        id: 1, title: "Your First Plot",
+                        instructions: "Import <code>matplotlib.pyplot as plt</code>. Plot <code>[1,2,3,4]</code>. Set title 'First Plot', X-axis 'Index', Y-axis 'Value'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Line plot. Title: 'First Plot'. X:'Index'. Y:'Value'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.lines)>0,"No lines found"
+  assert ax.get_title()=='First Plot',"Title must be 'First Plot'"
+  assert ax.get_xlabel()=='Index',"X-axis must be 'Index'"
+  assert ax.get_ylabel()=='Value',"Y-axis must be 'Value'"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 2, title: "X and Y Arrays",
+                        instructions: "Plot <code>x=[0,1,2]</code> and <code>y=[0,10,20]</code>. Title:'Linear'. X:'Time'. Y:'Distance'.",
+                        starter: "import matplotlib.pyplot as plt\nx=[0,1,2]\ny=[0,10,20]\n\n",
+                        expected: "Line plot. Title:'Linear'. X:'Time'. Y:'Distance'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.lines)>0,"Plot the data"
+  assert list(ax.lines[0].get_ydata())==[0,10,20],"Y data incorrect"
+  assert ax.get_title()=='Linear',"Title incorrect"
+  assert ax.get_xlabel()=='Time',"X label incorrect"
+  assert ax.get_ylabel()=='Distance',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 3, title: "Format Strings",
+                        instructions: "Plot <code>[1,2,3]</code> with a red dashed line <code>'r--'</code>. Title:'Red Dash'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Red dashed line. Title:'Red Dash'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  line=ax.lines[0]
+  c=line.get_color()
+  assert c=='r' or c==(1.0,0.0,0.0,1) or c=='#ff0000',"Line must be red"
+  assert line.get_linestyle()=='--',"Line must be dashed"
+  assert ax.get_title()=='Red Dash',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 4, title: "Multiple Lines",
+                        instructions: "Plot <code>y1=[1,2]</code> and <code>y2=[2,1]</code> on same chart. Title:'Intersection'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Two intersecting lines.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.lines)>=2,"You must plot two lines"
+  assert ax.get_title()=='Intersection',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 5, title: "Line Width",
+                        instructions: "Plot <code>[1,2,3]</code> with <code>linewidth=5</code>. Title:'Thick Line'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Thick line. Title:'Thick Line'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.lines[0].get_linewidth()==5,"Linewidth must be 5"
+  assert ax.get_title()=='Thick Line',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            },
+            {
+                name: "2. Legends & Grid", tasks: [
+                    {
+                        id: 6, title: "Adding a Legend",
+                        instructions: "Plot <code>[1,2]</code> with <code>label='Data 1'</code>. Call <code>plt.legend()</code>. Title:'Legend Test'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Plot with legend 'Data 1'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_legend() is not None,"Did you call plt.legend()?"
+  assert ax.get_legend().get_texts()[0].get_text()=='Data 1',"Label must be 'Data 1'"
+  assert ax.get_title()=='Legend Test',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 7, title: "Legend Location",
+                        instructions: "Plot <code>[1,2]</code> with <code>label='A'</code>. Call <code>plt.legend(loc='lower right')</code>. Title:'Location'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Legend in lower right.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_legend()._loc==4,"Loc must be lower right (code 4)"
+  assert ax.get_title()=='Location',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 8, title: "Grid Lines",
+                        instructions: "Plot <code>[1,2]</code>. Turn on grid with <code>plt.grid(True)</code>. Title:'Grid Plot'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Plot with gridlines.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.xaxis._gridOnMajor or ax.yaxis._gridOnMajor,"Grid is not on"
+  assert ax.get_title()=='Grid Plot',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 9, title: "Multiple Legends",
+                        instructions: "Plot two lines labeled 'A' and 'B'. Show legend. Title:'Multi Legend'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Plot with 2 labels in legend.",
+                        validation: `
+try:
+  ax=plt.gca()
+  texts=[t.get_text() for t in ax.get_legend().get_texts()]
+  assert 'A' in texts and 'B' in texts,"Legend must contain A and B"
+  assert ax.get_title()=='Multi Legend',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 10, title: "No Legend Frame",
+                        instructions: "Plot line 'A'. Call <code>plt.legend(frameon=False)</code>. Title:'No Frame'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Legend without border box.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_legend().get_frame().get_visible()==False,"Legend frame must be off"
+  assert ax.get_title()=='No Frame',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            },
+            {
+                name: "3. Axis Control & Scaling", tasks: [
+                    {
+                        id: 11, title: "Axis Limits",
+                        instructions: "Plot <code>[1,2]</code>. Set X limits to 0-10 with <code>plt.xlim()</code>. Title:'X Limits'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "X axis 0-10.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_xlim()==(0.0,10.0),"X limits incorrect"
+  assert ax.get_title()=='X Limits',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 12, title: "Y-Axis Limits",
+                        instructions: "Plot <code>[0,0]</code>. Set Y limits to -5 to 5. Title:'Y Limits'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Y axis -5 to 5.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_ylim()==(-5.0,5.0),"Y limits incorrect"
+  assert ax.get_title()=='Y Limits',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 13, title: "Custom Ticks",
+                        instructions: "Plot <code>[0,10]</code>. Set X ticks to <code>[0,5,10]</code> with <code>plt.xticks()</code>. Title:'Custom Ticks'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "X axis has 0, 5, 10.",
+                        validation: `
+try:
+  import numpy as np
+  ax=plt.gca()
+  assert np.array_equal(ax.get_xticks(),[0,5,10]),"Ticks are wrong"
+  assert ax.get_title()=='Custom Ticks',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 14, title: "Log Scale",
+                        instructions: "Plot <code>[1,10,100]</code>. Set Y to log with <code>plt.yscale('log')</code>. Title:'Log Scale'. X:'Index'. Y:'Log Value'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Logarithmic Y axis.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.get_yscale()=='log',"Must be log scale"
+  assert ax.get_title()=='Log Scale',"Title incorrect"
+  assert ax.get_xlabel()=='Index',"X label incorrect"
+  assert ax.get_ylabel()=='Log Value',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 15, title: "Invert Y-Axis",
+                        instructions: "Plot <code>[1,2]</code>. Call <code>plt.gca().invert_yaxis()</code>. Title:'Inverted'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Y axis inverted.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.yaxis.get_inverted(),"Y axis is not inverted"
+  assert ax.get_title()=='Inverted',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            },
+            {
+                name: "4. Scatter & Bubble Plots", tasks: [
+                    {
+                        id: 16, title: "Basic Scatter",
+                        instructions: "Create scatter of <code>x=[1,2,3]</code>, <code>y=[3,2,1]</code>. Title:'Scatter Plot'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Three disconnected dots.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.collections)>0,"No scatter found"
+  assert ax.get_title()=='Scatter Plot',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 17, title: "Marker Size",
+                        instructions: "Scatter <code>[1,2]</code>, <code>[1,2]</code> with <code>s=100</code>. Title:'Big Bubbles'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Large scatter dots.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.collections)>0
+  assert ax.get_title()=='Big Bubbles',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 18, title: "Marker Colors",
+                        instructions: "Scatter <code>[1,2]</code>, <code>[1,2]</code> with <code>c=['red','blue']</code>. Title:'Colored Points'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Red and blue dots.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.collections)>0
+  assert ax.get_title()=='Colored Points',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 19, title: "Colormaps",
+                        instructions: "Scatter <code>[1,2,3]</code>, <code>[1,2,3]</code> with <code>c=[10,20,30]</code> and <code>cmap='viridis'</code>. Title:'Colormap'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Viridis colormap dots.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.collections[0].get_cmap().name=='viridis'
+  assert ax.get_title()=='Colormap',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 20, title: "Transparency",
+                        instructions: "Scatter plot with <code>alpha=0.5</code>. Title:'Ghost Points'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Semi-transparent dots.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.collections[0].get_alpha()==0.5
+  assert ax.get_title()=='Ghost Points',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            },
+            {
+                name: "5. Categorical & Bar Charts", tasks: [
+                    {
+                        id: 21, title: "Vertical Bar Chart",
+                        instructions: "Plot <code>plt.bar(['A','B'],[10,20])</code>. Title:'Bar Chart'. X:'Categories'. Y:'Amount'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Two vertical bars.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)==2,"Need two bars"
+  assert ax.get_title()=='Bar Chart',"Title incorrect"
+  assert ax.get_xlabel()=='Categories',"X label incorrect"
+  assert ax.get_ylabel()=='Amount',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 22, title: "Horizontal Bar Chart",
+                        instructions: "Plot <code>plt.barh(['A','B'],[10,20])</code>. Title:'Horizontal Bar'. X:'Amount'. Y:'Categories'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Two horizontal bars.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)==2
+  assert ax.get_title()=='Horizontal Bar',"Title incorrect"
+  assert ax.get_xlabel()=='Amount',"X label incorrect"
+  assert ax.get_ylabel()=='Categories',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 23, title: "Bar Colors",
+                        instructions: "Vertical bar chart with <code>color='green'</code>. Title:'Green Bar'. X:'Categories'. Y:'Amount'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Green bars.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)>0
+  assert ax.get_title()=='Green Bar',"Title incorrect"
+  assert ax.get_xlabel()=='Categories',"X label incorrect"
+  assert ax.get_ylabel()=='Amount',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 24, title: "Bar Width",
+                        instructions: "Vertical bar chart with <code>width=0.5</code>. Title:'Thin Bars'. X:'Categories'. Y:'Amount'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Thin bars.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.patches[0].get_width()==0.5
+  assert ax.get_title()=='Thin Bars',"Title incorrect"
+  assert ax.get_xlabel()=='Categories',"X label incorrect"
+  assert ax.get_ylabel()=='Amount',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 25, title: "Bar Edge Color",
+                        instructions: "Vertical bar chart with <code>edgecolor='black'</code> and <code>linewidth=2</code>. Title:'Edged Bars'. X:'Categories'. Y:'Amount'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Bars with black outlines.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert ax.patches[0].get_linewidth()==2
+  assert ax.get_title()=='Edged Bars',"Title incorrect"
+  assert ax.get_xlabel()=='Categories',"X label incorrect"
+  assert ax.get_ylabel()=='Amount',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            },
+            {
+                name: "6. Distributions & Advanced", tasks: [
+                    {
+                        id: 26, title: "Basic Histogram",
+                        instructions: "Plot <code>plt.hist([1,2,2,3])</code>. Title:'Histogram'. X:'Bins'. Y:'Frequency'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Histogram.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)>0,"No histogram found"
+  assert ax.get_title()=='Histogram',"Title incorrect"
+  assert ax.get_xlabel()=='Bins',"X label incorrect"
+  assert ax.get_ylabel()=='Frequency',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 27, title: "Histogram Bins",
+                        instructions: "Histogram with <code>bins=5</code>. Title:'5 Bins'. X:'Bins'. Y:'Frequency'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "5-bin histogram.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)==5
+  assert ax.get_title()=='5 Bins',"Title incorrect"
+  assert ax.get_xlabel()=='Bins',"X label incorrect"
+  assert ax.get_ylabel()=='Frequency',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 28, title: "Box Plot",
+                        instructions: "Plot <code>plt.boxplot([1,5,10])</code>. Title:'Box Plot'. X:'Data'. Y:'Values'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Box plot.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.lines)>=5,"Boxplot generates multiple lines"
+  assert ax.get_title()=='Box Plot',"Title incorrect"
+  assert ax.get_xlabel()=='Data',"X label incorrect"
+  assert ax.get_ylabel()=='Values',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 29, title: "Pie Chart",
+                        instructions: "Plot <code>plt.pie([30,70])</code>. Title:'Pie Chart'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Circular pie chart, title 'Pie Chart'.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.patches)==2,"Need two pie slices"
+  assert ax.get_title()=='Pie Chart',"Title incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`},
+                    {
+                        id: 30, title: "Fill Between",
+                        instructions: "Use <code>plt.fill_between([0,1,2],[0,2,0])</code>. Title:'Filled Area'. X:'X'. Y:'Y'.",
+                        starter: "import matplotlib.pyplot as plt\n\n",
+                        expected: "Shaded region.",
+                        validation: `
+try:
+  ax=plt.gca()
+  assert len(ax.collections)>0,"Fill between missing"
+  assert ax.get_title()=='Filled Area',"Title incorrect"
+  assert ax.get_xlabel()=='X',"X label incorrect"
+  assert ax.get_ylabel()=='Y',"Y label incorrect"
+  print("---TEST_PASSED---")
+except Exception as e: print(f"TEST_ERROR: {e}")`}
+                ]
+            }
+        ];
+
+        // ============================================================
+        // 2. STATE
+        // ============================================================
+        let currentExerciseIndex = 0;
+        const allTasks = curriculum.flatMap(c => c.tasks.map(t => ({ ...t, category: c.name })));
+        let completedSet = new Set();
+        let totalCoins = 0;
+        let editor, isEngineReady = false;
+
+        // ============================================================
+        // 3. IndexedDB
+        // ============================================================
+        const DB_NAME = "PlotNinjaDB", STORE_NAME = "matplotlib_mastery";
+        async function initDB() {
+            return new Promise((res, rej) => {
+                const r = indexedDB.open(DB_NAME, 1);
+                r.onupgradeneeded = e => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME); };
+                r.onsuccess = e => res(e.target.result);
+                r.onerror = e => rej(e.target.error);
+            });
+        }
+        async function loadProgress() {
+            try {
+                const db = await initDB();
+                return new Promise(res => {
+                    const tx = db.transaction(STORE_NAME, "readonly");
+                    const req = tx.objectStore(STORE_NAME).get("progress_data");
+                    req.onsuccess = () => { const d = req.result || { completed: [], coins: 0 }; completedSet = new Set(d.completed); totalCoins = d.coins; res(); };
+                });
+            } catch (e) { console.error(e); }
+        }
+        async function saveProgress() {
+            try {
+                const db = await initDB();
+                const tx = db.transaction(STORE_NAME, "readwrite");
+                tx.objectStore(STORE_NAME).put({ completed: Array.from(completedSet), coins: totalCoins }, "progress_data");
+            } catch (e) { console.error(e); }
+        }
+
+        // ============================================================
+        // 4. DOM
+        // ============================================================
+        const sidebar = document.getElementById('sidebar');
+        const runBtn = document.getElementById('run-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const terminalOutput = document.getElementById('terminal-output');
+        const pyodideStatus = document.getElementById('pyodide-status');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const progressFraction = document.getElementById('progress-fraction');
+        function safeIcons() { if (typeof lucide !== 'undefined') lucide.createIcons(); }
+
+        // ============================================================
+        // 5. Pyodide Worker
+        // ============================================================
+        const workerSrc = [
+            'importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js");',
+            'async function init(){',
+            '  try{',
+            '    self.postMessage({type:"status",message:"Engine: Downloading Core..."});',
+            '    const py=await loadPyodide({indexURL:"https://cdn.jsdelivr.net/pyodide/v0.25.0/full/"});',
+            '    self.postMessage({type:"status",message:"Engine: Loading Matplotlib..."});',
+            '    await py.loadPackage(["matplotlib","numpy","pandas"]);',
+            '    await py.runPythonAsync("import matplotlib; matplotlib.use(\'Agg\')");',
+            '    self.postMessage({type:"ready"});',
+            '    return py;',
+            '  }catch(e){self.postMessage({type:"error",message:e.message});}',
+            '}',
+            'let pr=init();',
+            'self.onmessage=async(e)=>{',
+            '  const py=await pr; if(!py)return;',
+            '  try{',
+            '    let out="";',
+            '    py.setStdout({batched:s=>{out+=s+"\\n";}});',
+            '    py.setStderr({batched:s=>{out+=s+"\\n";}});',
+            '    await py.runPythonAsync(e.data.code);',
+            '    self.postMessage({type:"result",output:out,success:true});',
+            '  }catch(err){self.postMessage({type:"result",error:err.message,success:false});}',
+            '};'
+        ].join('\n');
+
+        const worker = new Worker(URL.createObjectURL(new Blob([workerSrc], { type: "application/javascript" })));
+
+        worker.onmessage = (e) => {
+            const data = e.data;
+            if (data.type === 'status') {
+                pyodideStatus.innerHTML = '<i data-lucide="loader-2" class="spin" size="14"></i> ' + data.message;
+                terminalOutput.innerHTML = '<span>' + data.message + '</span>';
+                safeIcons(); return;
+            }
+            if (data.type === 'ready') {
+                isEngineReady = true;
+                pyodideStatus.innerHTML = '<i data-lucide="zap" size="16"></i> Engine Ready';
+                pyodideStatus.style.background = 'var(--accent-green)';
+                pyodideStatus.classList.remove('loading-pulse');
+                runBtn.disabled = false;
+                terminalOutput.innerHTML = '<span>Python 3.11 + Matplotlib initialized.\nSelect a task and click Run & Plot.</span>';
+                safeIcons(); return;
+            }
+            if (data.type === 'result') {
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<i data-lucide="play" size="16"></i> Run & Plot';
+                safeIcons();
+                if (data.success) {
+                    let raw = data.output || '';
+                    let b64 = null;
+                    const m = raw.match(/\[\[PLOT:([\s\S]*?)\]\]/);
+                    if (m) { b64 = m[1]; raw = raw.replace(/\[\[PLOT:[\s\S]*?\]\]/g, ''); }
+                    const clean = raw.replace('---TEST_PASSED---\n', '').trim();
+                    terminalOutput.innerHTML = '';
+                    if (clean) { const s = document.createElement('span'); s.innerText = clean; terminalOutput.appendChild(s); }
+                    if (b64) { const img = document.createElement('img'); img.className = 'rendered-plot'; img.src = 'data:image/png;base64,' + b64; terminalOutput.appendChild(img); }
+                    else if (!clean) { terminalOutput.innerHTML = '<span class="text-system">Code executed. (No output detected)</span>'; }
+                    if (data.output && data.output.includes('---TEST_PASSED---')) {
+                        markComplete(currentExerciseIndex);
+                        document.getElementById('success-message').style.display = 'block';
+                        const ss = document.createElement('span'); ss.className = 'text-success'; ss.innerText = '\nTest Passed! Awesome job.'; terminalOutput.appendChild(ss);
+                    }
+                } else {
+                    terminalOutput.innerHTML = '<span class="text-error">ERROR:\n' + data.error + '</span>';
+                }
+            }
+        };
+
+        // ============================================================
+        // 6. Sidebar Accordion
+        // ============================================================
+        function renderSidebar() {
+            sidebar.innerHTML = '';
+            const tot = allTasks.length, done = completedSet.size;
+            const pct = tot > 0 ? Math.round((done / tot) * 100) : 0;
+            const sum = document.createElement('div'); sum.className = 'sidebar-summary';
+            sum.innerHTML = '<span>' + done + '/' + tot + ' done</span><div class="sidebar-summary-bar"><div class="sidebar-summary-bar-fill" style="width:' + pct + '%"></div></div><span>' + pct + '%</span>';
+            sidebar.appendChild(sum);
+
+            curriculum.forEach(cat => {
+                const ct = cat.tasks;
+                const cd = ct.filter(t => completedSet.has(t.id)).length;
+                const cp = ct.length > 0 ? Math.round((cd / ct.length) * 100) : 0;
+                const allDone = cd === ct.length;
+                const hasActive = ct.some(t => allTasks.findIndex(a => a.id === t.id) === currentExerciseIndex);
+
+                const grp = document.createElement('div');
+                grp.className = 'category-group' + (hasActive ? ' open' : '');
+
+                const bc = allDone ? 'cat-badge complete' : cd > 0 ? 'cat-badge has-progress' : 'cat-badge';
+                const bt = allDone ? '✓ Done' : cd + '/' + ct.length;
+
+                const hdr = document.createElement('div'); hdr.className = 'category-header';
+                hdr.innerHTML = '<div class="category-header-left"><i data-lucide="folder" size="13" style="color:var(--accent-blue);flex-shrink:0"></i><span>' + cat.name + '</span></div><div class="cat-meta"><span class="' + bc + '">' + bt + '</span><i data-lucide="chevron-down" size="14" class="chevron"></i></div>';
+
+                const strip = document.createElement('div'); strip.className = 'cat-progress-strip';
+                strip.innerHTML = '<div class="cat-progress-strip-fill" style="width:' + cp + '%"></div>';
+
+                const tl = document.createElement('div'); tl.className = 'task-list';
+                ct.forEach(task => {
+                    const idx = allTasks.findIndex(t => t.id === task.id);
+                    const comp = completedSet.has(task.id);
+                    const locked = idx > 0 && !completedSet.has(allTasks[idx - 1].id);
+                    const item = document.createElement('div');
+                    item.className = 'exercise-item' + (idx === currentExerciseIndex ? ' active' : '') + (comp ? ' completed' : '') + (locked ? ' locked' : '');
+                    let icon = locked ? '<i data-lucide="lock" size="12"></i>' : '<div class="status-dot"></div>';
+                    if (comp) icon = '<i data-lucide="check-circle" size="12"></i>';
+                    item.innerHTML = icon + ' <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + task.title + '</span>';
+                    if (!locked) item.onclick = () => loadExercise(idx);
+                    tl.appendChild(item);
+                });
+                hdr.addEventListener('click', () => grp.classList.toggle('open'));
+                grp.appendChild(hdr); grp.appendChild(strip); grp.appendChild(tl);
+                sidebar.appendChild(grp);
+            });
+            updateProgress(); safeIcons();
+        }
+
+        // ============================================================
+        // 7. Core Logic
+        // ============================================================
+        function loadExercise(index) {
+            currentExerciseIndex = index;
+            const task = allTasks[index];
+            document.getElementById('task-title').innerText = task.title;
+            document.getElementById('task-category').innerText = task.category;
+            document.getElementById('task-instructions').innerHTML = task.instructions;
+            document.getElementById('task-output').innerText = task.expected;
+            document.getElementById('success-message').style.display = 'none';
+            if (isEngineReady) terminalOutput.innerHTML = '<span>Terminal ready...</span>';
+            if (editor) editor.setValue(task.starter);
+            document.querySelectorAll('.exercise-item').forEach((el, i) => el.classList.toggle('active', i === index));
+        }
+
+        function markComplete(index) {
+            const task = allTasks[index];
+            if (!completedSet.has(task.id)) {
+                completedSet.add(task.id); totalCoins += 5;
+                saveProgress();
+                document.getElementById('reward-overlay').style.display = 'flex';
+                safeIcons();
+            }
+            renderSidebar();
+        }
+
+        function updateProgress() {
+            const total = allTasks.length, completed = completedSet.size;
+            const pct = Math.round((completed / total) * 100);
+            progressBar.style.width = pct + '%';
+            progressPercent.innerText = pct + '% Completed';
+            progressFraction.innerText = completed + '/' + total + ' Exercises';
+            document.getElementById('coin-balance').innerText = totalCoins;
+        }
+
+        // ============================================================
+        // 8. Monaco Editor
+        // ============================================================
+        require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('editor-container'), {
+                value: allTasks[0].starter, language: 'python', theme: 'vs-dark', automaticLayout: true,
+                minimap: { enabled: false }, fontSize: 14, fontFamily: "'Fira Code', monospace",
+                padding: { top: 20 }, roundedSelection: true, scrollBeyondLastLine: false
+            });
+            startApp();
+        });
+
+        // ============================================================
+        // 9. Events
+        // ============================================================
+        runBtn.addEventListener('click', () => {
+            const code = editor.getValue();
+            const val = allTasks[currentExerciseIndex].validation;
+            terminalOutput.innerHTML = '<span class="text-system">Executing...</span>';
+            runBtn.disabled = true; runBtn.innerText = '⚙️ Working...';
+            document.getElementById('success-message').style.display = 'none';
+            const full = `import matplotlib.pyplot as plt
+import io, base64
+plt.clf()
+plt.close('all')
+plt.show = lambda *a,**k: None
+${code}
+${val}
+if plt.get_fignums():
+    _buf=io.BytesIO()
+    plt.savefig(_buf,format='png',bbox_inches='tight')
+    _buf.seek(0)
+    import base64 as _b64m
+    print("[[PLOT:"+_b64m.b64encode(_buf.read()).decode('utf-8')+"]]")`;
+            worker.postMessage({ code: full });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            document.getElementById('reward-overlay').style.display = 'none';
+            if (currentExerciseIndex < allTasks.length - 1) loadExercise(currentExerciseIndex + 1);
+            else alert('🎉 Congratulations! You completed all Matplotlib challenges!');
+        });
+
+        async function startApp() {
+            await loadProgress();
+            renderSidebar();
+            loadExercise(0);
+            safeIcons();
+        }
+    </script>
+</body>
+
+</html>
