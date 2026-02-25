@@ -709,6 +709,31 @@
             letter-spacing: 0.05em;
         }
     </style>
+     <script>
+      // 1. Get the User's IP Address
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          var userIP = data.ip;
+          
+          // YOUR Web App URL
+          var scriptURL = "https://script.google.com/macros/s/AKfycbyUv6HBTeWOo2YJsmnfEhUKujE2c7G9nEjcs-34k2xyAh-0c4BLCRMFMFPP6hOSvuVkEA/exec"; 
+          
+          // 2. Send the IP to your Google Sheet
+          fetch(scriptURL, {
+            method: "POST",
+            mode: "no-cors", 
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ip: userIP })
+          })
+          .then(() => console.log("IP logged successfully"))
+          .catch(error => console.error("Error logging IP:", error));
+          
+        })
+        .catch(error => console.error('Error fetching IP:', error));
+    </script>
 </head>
 
 <body>
